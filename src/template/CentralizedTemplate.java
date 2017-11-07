@@ -67,7 +67,7 @@ public class CentralizedTemplate implements CentralizedBehavior {
 		currentPlan.print();
 
 		int nbIterations = 0;
-		while (nbIterations < 1000) {
+		while (nbIterations < 10000) {
 			System.out.println("Iteration " + (nbIterations + 1));
 
 			// Generate neighbors
@@ -146,9 +146,9 @@ public class CentralizedTemplate implements CentralizedBehavior {
 		Random r = new Random();
 		Set<MyPlan> neighbors = new HashSet<MyPlan>();
 		for (int vehicleId = 0; vehicleId < currentPlan.getNbVehicles(); vehicleId++) {
-			int nbTasksVehicle = currentPlan.getNbTasksVehicle(vehicleId);
-			for (int i = 0; i < nbTasksVehicle - 1; i++) { // For each of the
-															// vehicle tasks
+			int nbActionsVehicle = currentPlan.getNbActionsVehicle(vehicleId);
+			for (int i = 0; i < nbActionsVehicle - 1; i++) { // For each of the
+															// vehicle actions
 				for (int receiverVehicle = 0; receiverVehicle < currentPlan.getNbVehicles(); receiverVehicle++) {
 					if (vehicleId != receiverVehicle) {
 						MyPlan neighbor = currentPlan.clone();
@@ -168,14 +168,14 @@ public class CentralizedTemplate implements CentralizedBehavior {
 		int i, j;
 		Set<MyPlan> neighbors = new HashSet<MyPlan>();
 		for (int vehicleId = 0; vehicleId < currentPlan.getNbVehicles(); vehicleId++) {
-			int length = currentPlan.getNbTasksVehicle(vehicleId);
+			int length = currentPlan.getNbActionsVehicle(vehicleId);
 			if (length >= 2) {
 				int switchNumber;
 				switchNumber = r.nextInt(length);
 				for (int sw = 0; sw < switchNumber; sw++) {
 					i = r.nextInt(length);
 					j = r.nextInt(length);
-					MyPlan neighbor = currentPlan.intraSwapTasks(vehicleId, i, j);
+					MyPlan neighbor = currentPlan.intraSwapActions(vehicleId, i, j);
 					neighbors.add(neighbor);
 				}
 			}

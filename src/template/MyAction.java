@@ -2,14 +2,14 @@ package template;
 
 import logist.task.Task;
 
-public class MyTask {
+public class MyAction {
 
 	private Task task;
 
 	private boolean pickup; // Is it the pickup or the delivery of the task at
 							// stake ?
 
-	public MyTask(Task task, boolean pickup) {
+	public MyAction(Task task, boolean pickup) {
 		this.task = task;
 		this.pickup = pickup;
 	}
