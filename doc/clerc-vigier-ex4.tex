@@ -1,10 +1,20 @@
 \documentclass[11pt]{article}
 
+
 \usepackage{amsmath}
 \usepackage{textcomp}
 
 % Add other packages here %
 \usepackage{graphicx}  
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ left=35mm,
+ top=35mm,
+ right=35mm,
+ bottom=35mm
+ }
+
 
 % Put your group number and names in the author field %
 \title{\bf Excercise 4\\ Implementing a centralized agent}
@@ -95,12 +105,51 @@ We fix $N_{iterations} = 10000$ so that the algorithm converges i.e. the best co
 \subsubsection{Observations}
 % Describe the experimental results and the conclusions you inferred from these results %
 
-In the table \ref{trade_off_exploration_optimization}, we can see the cost of the best plan returned by the algorithm for different values of $p$.
+In the figure \ref{trade_off_exploration_optimization}, we can see the cost of the best plan returned by the algorithm for different values of $p$.
 
 \begin{figure}[h!]
 \begin{center}
+\begin{tabular}{cc}
+\begin{minipage}[c]{0.3\linewidth}
+\centering
+\begin{scriptsize}
+\begin{tabular}{|c|c|}
+\hline
+$p$ & cost \\
+\hline
+0.0 & 21846 \\
+\hline
+0.1	& 20187.5 \\
+\hline
+0.2	& 21859.5 \\
+\hline
+0.3	& 16758.5 \\
+\hline
+0.4	& 18151.5 \\
+\hline
+0.5	& 17861 \\
+\hline
+0.6	& 19677 \\
+\hline
+0.7	& 16654 \\
+\hline
+0.8	& 21676.5 \\
+\hline
+0.9	& 23829.5 \\
+\hline
+1.0 & 25144 \\
+\hline
+\end{tabular}
+\end{scriptsize}
+\end{minipage}
+&
+\begin{minipage}[c]{0.5\linewidth}
+\centering
 \includegraphics[scale=0.6]{trade_off_exploration_optimization.png}
+\end{minipage}
+\end{tabular}
 \end{center}
+\label{trade_off_exploration_optimization}
 \end{figure}
 
 These results are not very accurate because we only did one run for each value of $p$. It would have been better to compute an average over several runs. 
@@ -115,9 +164,32 @@ Finally, according to these results, we set $p = 0.5$.
 \subsubsection{Setting}
 % Describe the settings of your experiment: topology, task configuration, number of tasks, number of vehicles, etc. %
 
+We keep the English topology but we now set the number of tasks to 50 and the number of vehicles to 12.
+
 \subsubsection{Observations}
 % Describe the experimental results and the conclusions you inferred from these results %
 % Reflect on the fairness of the optimal plans. Observe that optimality requires some vehicles to do more work than others. %
 % How does the complexity of your algorithm depend on the number of vehicles and various sizes of the task set? %
+
+The best plan we obtain has a cost of $32524.0$ but what interests us is the repartition of tasks between the vehicles :
+
+\begin{table}[h!]
+\centering
+\begin{scriptsize}
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+Vehicle & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 \\
+\hline
+Number of tasks & 23 & 3 & 4 & 0 & 0 & 6 & 4 & 4 & 6 & 0 & 0 & 0 \\
+\hline
+\end{tabular}
+\end{scriptsize}
+\end{table}
+
+We observe that the first vehicle has nearly half of the tasks while 5 vehicles have no tasks at all. Thus while it is good this plan is not fair at all.
+
+The algorithm does not scale very well because the number of neighbors generated at each iteration is $O(N_{vehicles}N_{tasks})$ by performing \textit{interChanges} and $O(N_{tasks}^2)$ by performing \textit{intraChanges}. 
+
+We could fix the complexity of each iteration by setting $N_{intraChanges}$ the number of \textit{intraChanges} and $N_{interChanges}$ the number of \textit{interChanges} we want to perform and then choosing the vehicles and tasks randomly in the corresponding procedures.
 
 \end{document}
