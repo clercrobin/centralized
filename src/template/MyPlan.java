@@ -18,7 +18,8 @@ public class MyPlan implements Cloneable {
 		this.nbVehicles = nbVehicles_;
 		repartition = new HashMap<Integer, LinkedList<MyAction>>(nbVehicles_);
 		for (int i = 0; i < nbVehicles_; i++) {
-			repartition.put(i, new LinkedList<MyAction>()); // We initialize with
+			repartition.put(i, new LinkedList<MyAction>()); // We initialize
+															// with
 															// an empty linked
 															// list
 		}
@@ -130,11 +131,11 @@ public class MyPlan implements Cloneable {
 
 	public MyPlan interSwapTasks(int vehicleId1, int vehicleId2, int taskIndex) {
 
-		MyAction tv1 = getVehicleActions(vehicleId1).get(taskIndex);
+		MyAction action = getVehicleActions(vehicleId1).get(taskIndex);
 
-		if (tv1 != null && vehicleId1 < this.nbVehicles && vehicleId2 < this.nbVehicles) {
-			this.removeTask(vehicleId1, tv1.getTask());
-			this.addTask(vehicleId2, tv1.getTask());
+		if (action != null && vehicleId1 < this.nbVehicles && vehicleId2 < this.nbVehicles) {
+			this.removeTask(vehicleId1, action.getTask());
+			this.addTask(vehicleId2, action.getTask());
 		}
 
 		return this;
@@ -166,7 +167,8 @@ public class MyPlan implements Cloneable {
 		for (int i = 0; i < vehicles.length; i++) {
 			City tmpCity = vehicles[i].getCurrentCity();
 			for (MyAction action : repartition.get(i)) {
-				City nextCity = action.isPickup() ? action.getTask().pickupCity : action.getTask().deliveryCity;
+				City nextCity = action.isPickup() ? action.getTask().pickupCity
+						: action.getTask().deliveryCity;
 				totalCost += (tmpCity.distanceTo(nextCity) * vehicles[i].costPerKm());
 				tmpCity = nextCity;
 			}
@@ -185,7 +187,8 @@ public class MyPlan implements Cloneable {
 
 		City intermediateCity = current;
 		for (MyAction action : actions) {
-			City nextDestination = action.isPickup() ? action.getTask().pickupCity : action.getTask().deliveryCity;
+			City nextDestination = action.isPickup() ? action.getTask().pickupCity : action
+					.getTask().deliveryCity;
 
 			for (City c : intermediateCity.pathTo(nextDestination))
 				p.appendMove(c);

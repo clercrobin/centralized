@@ -67,7 +67,7 @@ public class CentralizedTemplate implements CentralizedBehavior {
 		currentPlan.print();
 
 		int nbIterations = 0;
-		while (nbIterations < 10000) {
+		while (nbIterations < 1000) {
 			System.out.println("Iteration " + (nbIterations + 1));
 
 			// Generate neighbors
