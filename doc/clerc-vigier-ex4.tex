@@ -4,11 +4,11 @@
 \usepackage{textcomp}
 
 % Add other packages here %
-
+\usepackage{graphicx}  
 
 % Put your group number and names in the author field %
 \title{\bf Excercise 4\\ Implementing a centralized agent}
-\author{Group \textnumero 3 : Robin Clerc, Pierre Vigier}
+\author{Group \textnumero 3 : Robin \textsc{Clerc}, Pierre \textsc{Vigier}}
 
 
 % N.B.: The report should not be longer than 3 pages %
@@ -21,14 +21,14 @@
 
 \subsection{Variables}
 % Describe the variables used in your solution representation %
-Our solution is described by a $Hashmap$ of capacity $Nb_{Vehicles}$ mapping each vehicle to the ordered list of its objects $MyTask$, its actions.
+Our solution is described by an array of length $N_{Vehicles}$ mapping each vehicle to the ordered list of its actions which are represented by a class $MyAction$, .
 
-One $MyTask$ object is described by
+One $MyAction$ object is described by
 \begin{itemize}
     \item a Logist $Task$
     \item the information whether it is a pickup or a delivery
 \end{itemize}
-There are $2 \times Nb_{Tasks}$ such task to dispatch on the vehicles set. We can remark that one of those actions represents several actual actions for the agent. This representation is far more convenient to deal with constraints.
+There are $2 \times N_{Tasks}$ such action to dispatch on the vehicles set. We can remark that one of those actions represents several actual actions for the agent. This representation is far more convenient to deal with constraints.
 
 \subsection{Constraints}
 % Describe the constraints in your solution representation %
@@ -39,17 +39,17 @@ The constraints to get a valid plan are :
 \begin{itemize}
     \item At each time the load of each vehicle cannot be greater than its capacity.
     \item A vehicle can pickup a task only if it did not have already been taken by a vehicle
-    \item A vehicle can deliver a task only if already carries the task to deliver.
-    \item All the tasks must be delivered at the end : the sum of all $MyTasks$ cumulated by all the vehicles must be $2 \times Nb_{Tasks} MyTasks$
+    \item A vehicle can deliver a task only if it already carries the task to deliver.
+    \item All the tasks must be delivered at the end : the number of actions done by all the vehicles must be $2 \times N_{Tasks}$
 \end{itemize}
 
 
 \subsection{Objective function}
 % Describe the function that you optimize %
 
-In this problem we have a fixed set of tasks, thus a fixed global award and want to generate the maximum profit from this situation : we have to reduce the cost of the plan.
+In this problem we have a fixed set of tasks, thus a fixed global award and we want to generate the maximum profit from this situation. Hence the optimal solution is the one with the minimal cost. Consequently, the objection function is the cost of the plan, that we want to minimize.
 
-The cost of the plan is defined by the sum of the costs of the plans of all the vehicles : $cost = \sum\limits_{k=1}^Nb_{Vehicles} cost(k^{th}_{Vehicle}) $
+The cost of the plan is defined by the sum of the costs of the plans of all the vehicles : $cost = \sum\limits_{k=1}^{N_{Vehicles}}{distanceTravelled(v_k) \times costByKm(v_k)}$.
 
 %With an infinite number of task we could also choose to minimize the duration of the whole delivery to maximize the profitability
 
@@ -64,15 +64,18 @@ Our initial solution is obtained by giving all the tasks to the vehicle with the
 % Describe how you generate neighbors %
 To generate neighbors we have several operations :
 \begin{itemize}
-    \item The IntraChanges : We change the order of the tasks inside a vehicle. The vehicle has a number of tasks $n$ and we select randomly a number $m$ between $0$ and $n$ to choose the number of swaps. Then for each swap we randomly the two $MyTask$ objects to swap.
-    \item The InterChanges : For each vehicle we try to give each task (the two $MyTask$ objects associated) to each other vehicle and process IntraChanges in the destination vehicle to select where it fits best.
+    \item The \textit{intraChanges} : We change the order of actions inside a vehicle. The vehicle has a number of actions $n$ and we select randomly a number $m$ between $0$ and $n$ to choose the number of swaps. Then for each swap we randomly choose the two $MyAction$ objects to swap.
+    \item The \textit{interChanges} : For each vehicle we try to give each task (i.e. the two $MyAction$ objects associated) to each other vehicle and apply intraChanges in the destination vehicle to shuffle the actions.
 \end{itemize}
 
 \subsection{Stochastic optimization algorithm}
 % Describe your stochastic optimization algorithm %
 
-For each iteration of our algorithm we generate both neighbors by IntraChanges and InterChanges and select the one with the minimal cost. If it is better than the current plan, it becomes the current plan. If it is not better, it also has a probability to become the current plan to avoid getting stuck in local minimum. However we always remember our best result so far and also have a probability to return to this state to avoid getting lost in a dead-end.
+In each iteration of our algorithm we generate neighbors by applying \textit{intraChanges} and \textit{interChanges} to our current solution. 
 
+Then we select the neighbor with the minimal cost. If it is better than the current plan, it becomes the current plan. Otherwise, it becomes the current plan anyway with probability $p$ to avoid getting stuck in local minimum. However we always remember our best plan so far and also have a probability $p'$ to return to this state to avoid getting lost in a dead-end.
+
+Finally, we return the best plan we have ever seen.
 
 \section{Results}
 
@@ -83,8 +86,28 @@ For each iteration of our algorithm we generate both neighbors by IntraChanges a
 % Describe the settings of your experiment: topology, task configuration, number of tasks, number of vehicles, etc. %
 % and the parameters you are analyzing %
 
+We use the English topology, the company A with the four given vehicles and 30 tasks.
+
+We choose to study the impact of the probability $p$ of choosing the best neighbor even if the current state is better. This parameter should control the trade-off between exploration and optimization.
+
+We fix $N_{iterations} = 10000$ so that the algorithm converges i.e. the best cost has not improved for a large number of iterations.
+
 \subsubsection{Observations}
 % Describe the experimental results and the conclusions you inferred from these results %
+
+In the table \ref{trade_off_exploration_optimization}, we can see the cost of the best plan returned by the algorithm for different values of $p$.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[scale=0.6]{trade_off_exploration_optimization.png}
+\end{center}
+\end{figure}
+
+These results are not very accurate because we only did one run for each value of $p$. It would have been better to compute an average over several runs. 
+
+However we can already observe a trend. When $p$ is too low that is when we optimize a lot but do not explore much or when $p$ is too high that is when we explore a lot but do not optimize much, the results are worse than when $p$ has an intermediate value. There is really a trade-off.
+
+Finally, according to these results, we set $p = 0.5$.
 
 \subsection{Experiment 2: Different configurations}
 % Run simulations for different configurations of the environment (i.e. different tasks and number of vehicles) %
